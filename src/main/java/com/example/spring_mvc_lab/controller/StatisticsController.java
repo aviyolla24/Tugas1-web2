@@ -1,30 +1,47 @@
 package com.example.spring_mvc_lab.controller;
 
-import com.example.spring_mvc_lab.service.ProductService;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
+import com.example.spring_mvc_lab.model.Product;
+import org.springframework.stereotype.Service;
 
-@Controller
+import java.util.*;
+import java.util.stream.Collectors;
+
+@Service
 public class StatisticsController {
 
-    private final ProductService productService;
+    private List<Product> products = new ArrayList<>();
 
-    public StatisticsController(ProductService productService) {
-        this.productService = productService;
+    public List<Product> findAll() {
+        return products;
     }
 
-    @GetMapping("/statistics")
-    public String statistics(Model model) {
+    public Map<String, Long> countByCategory() {
+        return products.stream()
+                .collect(Collectors.groupingBy(Product::getCategory, Collectors.counting()));
+    }
 
-        model.addAttribute("totalProducts", productService.findAll().size());
-        model.addAttribute("totalPerCategory", productService.countByCategory());
-        model.addAttribute("mostExpensive", productService.getMostExpensive());
-        model.addAttribute("cheapest", productService.getCheapest());
-        model.addAttribute("averagePrice", productService.getAveragePrice());
-        model.addAttribute("lowStockCount", productService.countLowStock());
-        model.addAttribute("title", "Statistik Produk");
+    public Product getMostExpensive() {
+        return products.stream()
+                .max(Comparator.comparing(Product::getPrice))
+                .orElse(null);
+    }
 
-        return "statistics";
+    public Product getCheapest() {
+        return products.stream()
+                .min(Comparator.comparing(Product::getPrice))
+                .orElse(null);
+    }
+
+    public double getAveragePrice() {
+        return products.stream()
+                .mapToDouble(Product::getPrice)
+                .average()
+                .orElse(0);
+    }
+
+    public long countLowStock() {
+        return products.stream()
+                .filter(p -> p.getStock() < 5)
+                .count();
     }
 }
