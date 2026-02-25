@@ -12,7 +12,7 @@ public class AboutController {
     @GetMapping("/about")
     public String about(Model model) {
 
-        model.addAttribute("Aviyolla Bria", "Spring MVC Lab");
+        model.addAttribute("", "Spring MVC Lab");
         model.addAttribute("version", "1.0");
         model.addAttribute("author", "Aviyolla Bria");
 
