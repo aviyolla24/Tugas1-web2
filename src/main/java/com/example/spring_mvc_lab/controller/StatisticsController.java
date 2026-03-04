@@ -1,47 +1,65 @@
 package com.example.spring_mvc_lab.controller;
 
 import com.example.spring_mvc_lab.model.Product;
-import org.springframework.stereotype.Service;
+import com.example.spring_mvc_lab.service.ProductService;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
 
-import java.util.*;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
-@Service
+@Controller
 public class StatisticsController {
 
-    private List<Product> products = new ArrayList<>();
+    private final ProductService productService;
 
-    public List<Product> findAll() {
-        return products;
+    public StatisticsController(ProductService productService) {
+        this.productService = productService;
     }
 
-    public Map<String, Long> countByCategory() {
-        return products.stream()
-                .collect(Collectors.groupingBy(Product::getCategory, Collectors.counting()));
-    }
+    @GetMapping("/statistics")
+    public String showStatistics(Model model) {
 
-    public Product getMostExpensive() {
-        return products.stream()
+        List<Product> products = productService.findAll(); // ✅ BENAR
+
+        model.addAttribute("title", "Statistik Produk");
+        model.addAttribute("totalProducts", products.size());
+
+        Map<String, Long> totalPerCategory = products.stream()
+                .collect(Collectors.groupingBy(
+                        Product::getCategory,
+                        Collectors.counting()));
+
+        model.addAttribute("totalPerCategory", totalPerCategory);
+
+        Product mostExpensive = products.stream()
                 .max(Comparator.comparing(Product::getPrice))
                 .orElse(null);
-    }
 
-    public Product getCheapest() {
-        return products.stream()
+        model.addAttribute("mostExpensive", mostExpensive);
+
+        Product cheapest = products.stream()
                 .min(Comparator.comparing(Product::getPrice))
                 .orElse(null);
-    }
 
-    public double getAveragePrice() {
-        return products.stream()
+        model.addAttribute("cheapest", cheapest);
+
+        double avg = products.stream()
                 .mapToDouble(Product::getPrice)
                 .average()
                 .orElse(0);
-    }
 
-    public long countLowStock() {
-        return products.stream()
-                .filter(p -> p.getStock() < 5)
+        model.addAttribute("averagePrice", avg);
+
+        long lowStockCount = products.stream()
+                .filter(p -> p.getStock() < 20)
                 .count();
+
+        model.addAttribute("lowStockCount", lowStockCount);
+
+        return "statistics";
     }
 }

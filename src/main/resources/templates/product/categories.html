@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Categories</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gradient-to-br from-[#800000] via-[#5a0000] to-[#2b0000] text-white min-h-screen">
+
+<div class="max-w-5xl mx-auto mt-16 px-6">
+
+    <h1 class="text-4xl font-extrabold text-center text-white tracking-wide mb-10">
+        Daftar Kategori
+    </h1>
+
+    <ul class="mt-6 space-y-5">
+        <li class="bg-white p-6 rounded-2xl shadow-2xl border-l-8 border-[#800000]
+                   hover:scale-105 transform transition duration-300"
+            th:each="category : ${categories}">
+
+            <a class="text-[#800000] text-xl font-bold hover:text-[#5a0000] transition"
+               th:href="@{/products/category/{cat}(cat=${category})}"
+               th:text="${category}">
+            </a>
+
+        </li>
+    </ul>
+
+    <a th:href="@{/products}"
+       class="inline-block mt-10 bg-white text-[#800000] hover:bg-gray-100
+              px-8 py-3 rounded-xl font-bold shadow-lg
+              hover:scale-105 transform transition duration-300">
+        ← Back to Products
+    </a>
+
+</div>
+
+</body>
+</html>
